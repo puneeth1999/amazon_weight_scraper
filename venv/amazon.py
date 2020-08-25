@@ -3,6 +3,14 @@ import requests
 import json 
 from time import sleep
 import selenium
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+i=0
+j=0
+optionss = webdriver.ChromeOptions();
+optionss.add_argument("headless")
+#Driver for chrome
+driver = webdriver.Chrome("/home/puneeth/PycharmProjects/pythonProject/amazon_scraper/venv/chromedriver", options=optionss)
 
 
 # Create an Extractor by reading from the YAML file
@@ -36,15 +44,73 @@ def scrape(url):
     # Pass the HTML of the page and create 
     return e.extract(r.text)
 
-
+desc_file = open('product_desc.json', 'w')
+desc_file.write('[\n')
+desc_file.write("{")
 
 # product_data = []
 with open("urls.txt",'r') as urllist, open('output.jsonl','w') as outfile:
     for url in urllist.read().splitlines():
-        data = scrape(url) 
+        '''Temporarily commented'''
+        data = scrape(url)
         if data:
             json.dump(data,outfile)
             outfile.write(",\n")
             # sleep(5)
+        '''Temporarily commented'''
+with open("urls.txt", "r") as urllist:
+    for url in urllist.read().splitlines():
+        try:
+            driver.get(url)
+            table = driver.find_elements_by_tag_name('table')
+            t = table[1]
+            t2 = table[2]
+            t_body = t.find_element_by_tag_name('tbody')
+            trs = t.find_elements_by_tag_name('tr')
+            trs2 = t2.find_elements_by_tag_name('tr')
+
+            print(t.text)
+            print(t2.text)
+
+
+            if(len(trs2) > 7):
+                # desc_file.write('{')
+                for i in range(len(trs2)):
+                    if(i == (len(trs2) - 1)):
+                        th = trs2[i].find_element_by_tag_name('th')
+                        td = trs2[i].find_element_by_tag_name('td')
+                        desc_file.write("\"" + th.text + "\"" + ":" + "\"" + td.text + "\"")
+                        break
+
+                    else:
+                        th = trs2[i].find_element_by_tag_name('th')
+                        td = trs2[i].find_element_by_tag_name('td')
+                        desc_file.write("\"" + th.text + "\"" + ":" + "\"" + td.text + "\",")
+                desc_file.write("},\n{")
+            if (len(trs) > 7):
+                for i in range(len(trs)):
+                    if (i == len(trs) - 1):
+                        th = trs[i].find_element_by_tag_name('th')
+                        td = trs[i].find_element_by_tag_name('td')
+                        desc_file.write("\"" + th.text + "\"" + ":" + "\"" + td.text + "\"")
+                        break
+
+                    else:
+                        th = trs[i].find_element_by_tag_name('th')
+                        td = trs[i].find_element_by_tag_name('td')
+                        desc_file.write("\"" + th.text + "\"" + ":" + "\"" + td.text + "\",")
+
+                desc_file.write("}\n{")
+        except:
+                pass
+
+        print('Finished ROUND -',j)
+        j+=1
+
+
+desc_file.write('\n]')
+desc_file.close()
+
+
 
     

@@ -56,6 +56,7 @@ for block in blocks:
         pass
 file.close()
 os.system('python amazon.py')
+# os.system('python amazon.py')
 
 '''new_features_branch'''
 
