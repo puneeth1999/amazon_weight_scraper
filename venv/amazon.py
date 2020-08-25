@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 i=0
 j=0
+item_weights = []
 optionss = webdriver.ChromeOptions();
 optionss.add_argument("headless")
 #Driver for chrome
@@ -80,12 +81,16 @@ with open("urls.txt", "r") as urllist:
                         th = trs2[i].find_element_by_tag_name('th')
                         td = trs2[i].find_element_by_tag_name('td')
                         desc_file.write("\"" + th.text + "\"" + ":" + "\"" + td.text + "\"")
+                        if(th.text == 'Item Weight'):
+                            item_weights.append(td.text)
                         break
 
                     else:
                         th = trs2[i].find_element_by_tag_name('th')
                         td = trs2[i].find_element_by_tag_name('td')
                         desc_file.write("\"" + th.text + "\"" + ":" + "\"" + td.text + "\",")
+                        if (th.text == 'Item Weight'):
+                            item_weights.append(td.text)
                 desc_file.write("},\n{")
             if (len(trs) > 7):
                 for i in range(len(trs)):
@@ -93,12 +98,16 @@ with open("urls.txt", "r") as urllist:
                         th = trs[i].find_element_by_tag_name('th')
                         td = trs[i].find_element_by_tag_name('td')
                         desc_file.write("\"" + th.text + "\"" + ":" + "\"" + td.text + "\"")
+                        if (th.text == 'Item Weight'):
+                            item_weights.append(td.text)
                         break
 
                     else:
                         th = trs[i].find_element_by_tag_name('th')
                         td = trs[i].find_element_by_tag_name('td')
                         desc_file.write("\"" + th.text + "\"" + ":" + "\"" + td.text + "\",")
+                        if (th.text == 'Item Weight'):
+                            item_weights.append(td.text)
 
                 desc_file.write("}\n{")
         except:
@@ -110,7 +119,41 @@ with open("urls.txt", "r") as urllist:
 
 desc_file.write('\n]')
 desc_file.close()
+print('\n\n')
+print(item_weights)
+
+def getWeight(item_weight_str):
+    weight_lst = weight_str.split(" ")
+    kilos = 0.0
+    grams = 0.0
+    try:
+        grams = float(weight_lst[weight_lst.index('g') - 1])
+    except:
+        pass
+    try:
+        kilos = float(weight_lst[weight_lst.index('kg') - 1])
+    except:
+        pass
+    total_weight = kilos + (grams/1000)
+    return total_weight
+print('\n')
+
+weights = []
+
+for l in item_weights:
+    stri = l
+    st_lis = stri.split()
+    if(len(st_lis) == 4):
+        print((int(st_lis[0])*1000) + int(st_lis[2]))
+        weights.append((int(st_lis[0])*1000) + int(st_lis[2]))
+    else:
+        print(int(st_lis[0]))
+        weights.append(int(st_lis[0]))
+
+if(len(weights) < 1):
+    print("Weights couldn't be scraped. Sorry!")
+else:
+    print('\nmaximum value:\t',  max(weights))
 
 
-
-    
+print(weights)
