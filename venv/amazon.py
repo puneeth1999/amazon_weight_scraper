@@ -156,4 +156,3 @@ else:
     print('\nmaximum value:\t',  max(weights))
 
 
-print(weights)
